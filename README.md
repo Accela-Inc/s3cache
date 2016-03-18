@@ -11,9 +11,12 @@ Or add the following to your Gemfile (do this for now):
 #Usage examples
 
     require 's3cache'
-    filecache = S3Cache.new
-    filecache.write("cache_name", "cache_contents")
+    cache = S3Cache.new({:bucket_name => "aws-bucket-name"})
+
+    cache.write("cache_name", "cache_contents")
+
     contents = filecache.read("cache_name")
+
     filecache.fetch("cache_name") do
         "cache_contents"
     end
