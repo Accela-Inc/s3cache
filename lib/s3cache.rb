@@ -10,7 +10,7 @@ class S3Cache
   def initialize(**params)
 
     if not params.to_h[:bucket_name]
-      puts "requires {:bucket_name => String, (optional) :expires => Interger, (optional) :debug => Boolean }"
+      puts "requires {:bucket_name => String, (optional) :expires => Integer, (optional) :debug => Boolean }"
     end
 
     @bucket_name = params.to_h[:bucket_name]
@@ -18,9 +18,9 @@ class S3Cache
     @debug = params.to_h[:debug] ? params.to_h[:debug] : false
     
     if ENV['AWS_ACCESS_KEY_ID'].nil? || ENV['AWS_SECRET_ACCESS_KEY'].nil?
-      raise 'Enviroment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be defined. Learn more http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#config-settings-and-precedence'  
+      puts 'Enviroment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be defined. Learn more http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#config-settings-and-precedence'  
     else
-      @s3 = Aws::S3::Client.new      
+      @s3 = Aws::S3::Client.new
       if not bucket_exist?
         puts "creating bucket #{@bucket_name}" if @debug
         bucket_create
@@ -109,10 +109,11 @@ class S3Cache
     
     def bucket_exist?
       begin
-        response = @s3.head_bucket({ bucket: @bucket_name, })
+        response = @s3.head_bucket({ bucket: @bucket_name })
       rescue 
         response = nil
       end
       return !response.nil?
     end   
 end
+
