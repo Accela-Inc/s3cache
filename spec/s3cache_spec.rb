@@ -1,5 +1,6 @@
 # I can't figure out how to test s3 modules without requiring a bunch of new gems.
 # Should look into fake-s3 gem
+require 'aws-sdk'
 
 # require 'spec_helper'
 require_relative '../lib/s3cache'
@@ -7,7 +8,7 @@ require_relative '../lib/s3cache'
 describe S3Cache do
 
   before do
-    # AWS.stub!
+    # @s3 = Aws::S3::Client.new(stub_responses: true)
     # @s3cache = S3Cache.new({:bucket_name => 'test-s3-cache'})
     # @cache_name = ['spec', 'test']
     # @cached_contents = 'Hello World'
