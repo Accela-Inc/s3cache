@@ -9,20 +9,21 @@ class S3Cache
 
   def initialize(**params)
 
+    @logger = Rails.logger ? Rails.logger : Logger.new(STDOUT)
+
     if not params.to_h[:bucket_name]
-      puts "requires {:bucket_name => String, (optional) :expires => Integer, (optional) :debug => Boolean }"
+      @logger.info{ "requires {:bucket_name => String, (optional) :expires => Integer}" }
     end
 
     @bucket_name = params.to_h[:bucket_name]
     @expires = params.to_h[:expires] ? params.to_h[:expires] : 32.days
-    @debug = params.to_h[:debug] ? params.to_h[:debug] : false
     
     if ENV['AWS_ACCESS_KEY_ID'].nil? || ENV['AWS_SECRET_ACCESS_KEY'].nil?
       puts 'Enviroment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be defined. Learn more http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#config-settings-and-precedence'  
     else
       @s3 = Aws::S3::Client.new
       if not bucket_exist?
-        puts "creating bucket #{@bucket_name}" if @debug
+        @logger.debug( "creating bucket #{@bucket_name}" )
         bucket_create
       end
     end
@@ -30,7 +31,7 @@ class S3Cache
 
   def read(key, **params)
     key_name = cache_key( key )
-    puts "read #{key_name}" if @debug
+    @logger.debug( "read #{key_name}" )
     if exist?(key_name)
       Marshal.load(@s3.get_object({ bucket: @bucket_name, key: key_name }).body.read)
     else
@@ -40,7 +41,7 @@ class S3Cache
 
   def write(key, contents, **params) 
     key_name = cache_key( key )
-    puts "write #{key_name}" if @debug
+    @logger.debug( "write #{key_name}" )
     @s3.put_object({ 
       bucket: @bucket_name, 
       key: key_name, 
@@ -53,10 +54,10 @@ class S3Cache
     key_name = cache_key( key )
 
     if(exist?(key_name) )
-      puts "fetch->read #{key_name}" if @debug
+      @logger.debug( "fetch->read #{key_name}" )
       read (key_name)
     else
-      puts "fetch->write #{key_name}" if @debug
+      @logger.debug( "fetch->write #{key_name}" )
       value = yield
       write(key_name, value)  
       read (key_name)    
@@ -70,13 +71,14 @@ class S3Cache
     rescue 
       response = nil
     end
-    puts "exists? #{response} #{key_name}" if @debug
+    
+    @logger.debug( "exists? #{!response.nil?} #{key_name}" )
     return !response.nil?
   end
   
   def clear
     cache_keys.each do |key|
-      puts "deleting key #{key}" if @debug
+      @logger.debug( "deleting key #{key}" )
       @s3.delete_object({:bucket => @bucket_name, :key => key})
     end
   end  
