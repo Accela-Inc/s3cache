@@ -5,7 +5,7 @@ require 'yaml'
 
 class S3Cache
 
-  VERSION = "0.9.1"
+  VERSION = "0.9.2"
 
   def initialize(**params)
 
