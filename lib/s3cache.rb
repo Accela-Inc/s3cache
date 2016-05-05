@@ -45,7 +45,7 @@ class S3Cache
     @s3.put_object({ 
       bucket: @bucket_name, 
       key: key_name, 
-      expires: Time.now + @expires.days,
+      expires: Time.now + @expires.days.seconds.to_i,
       body: Marshal.dump(contents),
     })
   end
@@ -68,6 +68,7 @@ class S3Cache
     key_name = cache_key( key )
     begin
       response =  @s3.get_object({:bucket => @bucket_name, :key => key_name})
+      return DateTime.now > response.to_h[:last_modified].to_date + @expires.days 
     rescue 
       response = nil
     end
