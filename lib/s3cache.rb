@@ -68,7 +68,10 @@ class S3Cache
     key_name = cache_key( key )
     begin
       response =  @s3.get_object({:bucket => @bucket_name, :key => key_name})
-      return DateTime.now > response.to_h[:last_modified].to_date + @expires.days 
+      response_status = DateTime.now > response.to_h[:last_modified].to_date + @expires.days 
+      @logger.debug( "cache valid #{response_status}" )
+      
+      return response_status
     rescue 
       response = nil
     end
