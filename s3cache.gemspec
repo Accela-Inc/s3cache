@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.authors     = ['Eddie A Tejeda']
   gem.email       = ['eddie@codeforamerica.org']
 
-  gem.add_development_dependency 'rake','~> 10.x'
+  gem.add_development_dependency 'rake','~> 13'
   gem.add_development_dependency 'rspec','~> 3.x'
   gem.add_development_dependency 'aws-sdk','~> 2'
 end
